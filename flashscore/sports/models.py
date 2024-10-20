@@ -23,7 +23,7 @@ class Team(models.Model):
     def __str__(self):
         return self.name
 
-class Player(models.model):
+class Player(models.Model):
     firstname = models.CharField(max_length=100)
     lastname = models.CharField(max_length=100)
     num_of_player = models.IntegerField()
@@ -31,9 +31,15 @@ class Player(models.model):
     date_of_birth = models.DateField()
     team = models.ForeignKey(Team, on_delete=models.CASCADE)
 
+    def __str__(self):
+        return self.firstname
+
 class Coach(models.Model):
     firstname = models.CharField(max_length=100)
     lastname = models.CharField(max_length=100)
     date_of_birth = models.DateField()
     team = models.ForeignKey(Team, on_delete=models.CASCADE)
     exp = models.IntegerField()
+    
+    def __str__(self):
+        return self.firstname
