@@ -39,7 +39,9 @@ This application includes management system of sport website and represent some 
       
 ## 2. Users:
 
-This application aimed at the authorization of users. User can register of website to have a profile and some interesting things and also has log in and log out system.
+This application aimed at the authorization of users. 
+User can register of website to have a profile and 
+some interesting things and also has log in and log out system.
 
 ## CRUD methods:
 
