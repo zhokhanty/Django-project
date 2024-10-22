@@ -14,18 +14,27 @@ Our project dedicates to sports and we create our own project similar to flashsc
 
 This application includes management system of sport website and represent some models in below:
 
-      # Sports:
+      Sports:
+      
       This fundamental model includes popular sports. Each sport entry 
       comprises essential details such as the leagues.
+      
       League:
+      
       This component includes some difference leagues 
       in which we divide by countries and something like this.
+      
       Team:
+      
       In this component we added a some teams and distributed into leagues.
+      
       Player:
+      
       This component includes detailed information about players like 
       position where he playing, number of player, what team does he play for and etc.
+      
       Coach:
+      
       This component includes detailed information and each coach has its team.
       
 ## 2. Users:
