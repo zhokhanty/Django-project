@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search Results</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<div class="container mt-5">
+    <h1>Search Results for "{{ query }}"</h1>
+
+    {% if not query %}
+    <div class="alert alert-warning">
+        Please enter a search term.
+    </div>
+    {% else %}
+
+    <h2>Sports</h2>
+    {% if sports %}
+    <ul class="list-group">
+        {% for sport in sports %}
+        <li class="list-group-item">
+            <a href="{% url 'sport_detail' sport.id %}">{{ sport.name }}</a>
+        </li>
+        {% endfor %}
+    </ul>
+    {% else %}
+    <p>No sports found.</p>
+    {% endif %}
+
+
+    <h2>Teams</h2>
+    {% if teams %}
+    <ul class="list-group">
+        {% for team in teams %}
+        <li class="list-group-item">
+            <a href="{% url 'team_detail' team.id %}">{{ team.name }}</a>
+        </li>
+        {% endfor %}
+    </ul>
+    {% else %}
+    <p>No teams found.</p>
+    {% endif %}
+
+
+    <h2>Players</h2>
+    {% if players %}
+    <ul class="list-group">
+        {% for player in players %}
+        <li class="list-group-item">
+            <a href="{% url 'player_detail' player.id %}">{{ player.firstname }} {{ player.lastname }}</a>
+        </li>
+        {% endfor %}
+    </ul>
+    {% else %}
+    <p>No players found.</p>
+    {% endif %}
+
+
+    <h2>Coaches</h2>
+    {% if coaches %}
+    <ul class="list-group">
+        {% for coach in coaches %}
+        <li class="list-group-item">
+            <a href="{% url 'coach_detail' coach.id %}">{{ coach.firstname }} {{ coach.lastname }}</a>
+        </li>
+        {% endfor %}
+    </ul>
+    {% else %}
+    <p>No coaches found.</p>
+    {% endif %}
+    {% endif %}
+</div>
+</body>
+</html>

@@ -4,6 +4,14 @@ from .models import Sport, League, Team, Player, Coach
 from .forms import SportForm
 from django.views.generic import DetailView
 from django.db.models import F
+from rest_framework.response import Response
+from rest_framework.decorators import api_view
+from rest_framework import status
+from .models import Sport, League, Team, Player, Coach
+from .serializers import SportSerializer, LeagueSerializer, TeamSerializer, PlayerSerializer, CoachSerializer
+
+
+
 
 def home(request):
     sports = Sport.objects.all()
@@ -72,3 +80,53 @@ def global_search(request):
         'coaches': coaches
     }
     return render(request, 'scores/search_results.html', context)
+
+# POST запрос для создания нового спорта
+@api_view(['POST'])
+def create_sport(request):
+    if request.method == 'POST':
+        serializer = SportSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+# POST запрос для создания новой лиги
+@api_view(['POST'])
+def create_league(request):
+    if request.method == 'POST':
+        serializer = LeagueSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+# POST запрос для создания новой команды
+@api_view(['POST'])
+def create_team(request):
+    if request.method == 'POST':
+        serializer = TeamSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+# POST запрос для создания нового игрока
+@api_view(['POST'])
+def create_player(request):
+    if request.method == 'POST':
+        serializer = PlayerSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+# POST запрос для создания нового тренера
+@api_view(['POST'])
+def create_coach(request):
+    if request.method == 'POST':
+        serializer = CoachSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
