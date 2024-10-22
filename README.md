@@ -14,7 +14,7 @@ Our project dedicates to sports and we create our own project similar to flashsc
 
 This application includes management system of sport website and represent some models in below:
 
-      Sports:
+      # Sports:
       This fundamental model includes popular sports. Each sport entry 
       comprises essential details such as the leagues.
       League:
