@@ -1,12 +1,10 @@
 import json
 from django.http import Http404, JsonResponse
-from django.shortcuts import render, redirect, get_object_or_404
+from django.shortcuts import render, get_object_or_404
 from django.urls import reverse_lazy
 from .models import Sport, League, Team, Player, Coach
 from .forms import SportForm
-from django.views.generic import DetailView
 from django.db.models import F
-from .models import Sport, League, Team, Player, Coach
 from django.views.decorators.csrf import csrf_exempt
 
 def home(request):
@@ -152,22 +150,9 @@ def create_team(request):
         }, status=201)
 
 def team_detail(request, id):
-    try:
-        team = Team.objects.get(id=id)
-        players = team.players.all()
-        coach = getattr(team, 'coach', None)
-        return JsonResponse({
-            'id': team.id,
-            'name': team.name,
-            'icon': team.icon.url if team.icon else None,
-            'leagues': [league.id for league in team.leagues.all()],
-            'points_l': team.points_l,
-            'points_c': team.points_c,
-            'players': [{'id': player.id, 'name': f"{player.firstname} {player.lastname}"} for player in players],
-            'coach': f"{coach.firstname} {coach.lastname}" if coach else None
-        })
-    except Team.DoesNotExist:
-        return JsonResponse({'error': 'Team not found'}, status=404)
+    team = get_object_or_404(Team, id=id)
+    players = team.players.all()
+    return render(request, 'scores/team_detail.html', {'team': team, 'players': players})
 
 @csrf_exempt
 def update_team(request, id):
@@ -234,18 +219,8 @@ def create_player(request):
         }, status=201)
 
 def player_detail(request, id):
-    try:
-        player = Player.objects.get(id=id)
-        return JsonResponse({
-            'id': player.id,
-            'name': f"{player.firstname} {player.lastname}",
-            'num_of_player': player.num_of_player,
-            'position': player.position,
-            'date_of_birth': player.date_of_birth,
-            'team': player.team.id
-        })
-    except Player.DoesNotExist:
-        return JsonResponse({'error': 'Player not found'}, status=404)
+    player = get_object_or_404(Player, id=id)
+    return render(request, 'scores/player_detail.html', {"player": player})
 
 @csrf_exempt
 def update_player(request, id):
@@ -283,7 +258,16 @@ def delete_player(request, id):
 def create_coach(request):
     if request.method == 'POST':
         data = json.loads(request.body)
-        team = get_object_or_404(Team, id=data.get("team_id"))
+
+        team_id = data.get("id")
+        if team_id is None:
+            return JsonResponse({'error': 'team_id is required'}, status=400)
+
+        try:
+            team = get_object_or_404(Team, id=team_id)
+        except Http404:
+            return JsonResponse({'error': 'Team not found'}, status=404)
+        
         coach = Coach.objects.create(
             firstname=data.get("firstname"),
             lastname=data.get("lastname"),
@@ -300,17 +284,8 @@ def create_coach(request):
         }, status=201)
 
 def coach_detail(request, id):
-    try:
-        coach = Coach.objects.get(id=id)
-        return JsonResponse({
-            'id': coach.id,
-            'name': f"{coach.firstname} {coach.lastname}",
-            'date_of_birth': coach.date_of_birth,
-            'exp': coach.exp,
-            'team': coach.team.id
-        })
-    except Coach.DoesNotExist:
-        return JsonResponse({'error': 'Coach not found'}, status=404)
+    coach = get_object_or_404(Coach, id=id)
+    return render(request, 'scores/coach_detail.html', {'coach': coach})
 
 @csrf_exempt
 def update_coach(request, id):
@@ -340,32 +315,6 @@ def delete_coach(request, id):
         coach = get_object_or_404(Coach, id=id)
         coach.delete()
         return JsonResponse({'message': 'Coach deleted successfully'}, status=204)
-    
-
-# class TeamDetailView(DetailView):
-#     model = Team
-#     template_name = 'scores/team_detail.html'
-#     context_object_name = 'team'
-
-# class PlayerDetailView(DetailView):
-#     model = Player
-#     template_name = 'scores/player_detail.html'
-#     context_object_name = 'player'
-
-# class CoachDetailView(DetailView):
-#     model = Coach
-#     template_name = 'scores/coach_detail.html'
-#     context_object_name = 'coach'
-
-# class LeagueTableView(DetailView):
-#     model = League
-#     template_name = 'scores/league_table.html'
-#     context_object_name = 'league'
-
-#     def get_context_data(self, **kwargs):
-#         context = super().get_context_data(**kwargs)
-#         context['matches'] = self.object.matches.all().order_by('-date')[:10]
-#         return context
 
 def global_search(request):
     query = request.GET.get('q')
