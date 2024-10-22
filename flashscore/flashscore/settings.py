@@ -43,7 +43,6 @@ INSTALLED_APPS = [
     'users',
     'scores',
     'media',
-    'rest_framework'
 ]
 
 MIDDLEWARE = [
