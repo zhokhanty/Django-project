@@ -1,83 +1,94 @@
 # Django-project
-This project related to sports
+This project is a sports management platform inspired by Flashscore, aimed at creating a web application to track sports data such as teams, leagues, players, and coaches. The platform also allows users to register, manage profiles, and interact with sports content through a CRUD interface.
 
-## Members:
-    * Bagythzhan Zhalgas 22B030317
-    * Mussilimov Galymzhan 22B031186
-    * Kyanysh Farabi 22B030489
+## Team Members:
 
-## Description:
-
-Our project dedicates to sports and we create our own project similar to flashscore. This project has two applications:
-
-## 1. Scores:
-
-This application includes management system of sport website and represent some models in below:
-
-      Sports:
+      Bagytzhan Zhalgas (22B030317)
+      Mussilimov Galymzhan (22B031186)
+      Kyanysh Farabi (22B030489)
       
-      This fundamental model includes popular sports. Each sport entry 
-      comprises essential details such as the leagues.
-      
-      League:
-      
-      This component includes some difference leagues 
-      in which we divide by countries and something like this.
-      
-      Team:
-      
-      In this component we added a some teams and distributed into leagues.
-      
-      Player:
-      
-      This component includes detailed information about players like 
-      position where he playing, number of player, what team does he play for and etc.
-      
-      Coach:
-      
-      This component includes detailed information and each coach has its team.
-      
-## 2. Users:
+# Project Structure
 
-This application aimed at the authorization of users. 
-User can register of website to have a profile and 
-some interesting things and also has log in and log out system.
+This project consists of two main applications:
 
-## CRUD methods:
+      Scores
+      Users
 
-Our project has all CRUD method for each models:
+# 1. Scores Application
 
-    # Sport CRUD
-    path('sport/create/', views.create_sport, name='create_sport'),
-    path('sport/<int:id>/', views.sport_detail, name='sport_detail'),
-    path('sport/<int:id>/update/', views.update_sport, name='update_sport'),
-    path('sport/<int:id>/delete/', views.delete_sport, name='delete_sport'),
+The Scores app is responsible for managing sports data, including various models like Sports, Leagues, Teams, Players, and Coaches. Each of these models has full CRUD (Create, Read, Update, Delete) functionality.
 
-    # League CRUD
-    path('league/create/', views.create_league, name='create_league'),
-    path('league/<int:id>/', views.league_detail, name='league_detail'),
-    path('league/<int:id>/update/', views.update_league, name="update_league"),
-    path('league/<int:id>/delete/', views.delete_league, name="delete_league"),
+Models Overview
 
-    # Team CRUD
-    path('team/create/', views.create_team, name='create_team'),
-    path('team/<int:id>/', views.team_detail, name='team_detail'),
-    path('team/<int:id>/update/', views.update_team, name='update_team'),
-    path('team/<int:id>/delete/', views.delete_team, name='delete_team'),
+      1.1 Sports
+      
+      The fundamental model that holds a list of popular sports. Each sport entry consists of key attributes, including associated leagues.
+      
+      1.2 Leagues
+      
+      A model that represents different leagues, organized by countries or other relevant categories. Leagues are associated with specific sports.
+      
+      1.3 Teams
+      
+      This model manages sports teams, which are grouped under different leagues.
+      
+      1.4 Players
+      
+      This model holds detailed information about players, including:
+      
+      Player's name
+      Position
+      Team affiliation
+      Player's number, and other attributes.
+      
+      1.5 Coaches
+      
+      The Coaches model provides detailed information about coaches, including their team affiliation.
 
-    # Player CRUD
-    path('player/create/', views.create_player, name='create_player'),
-    path('player/<int:id>/', views.player_detail, name='player_detail'),
-    path('player/<int:id>/update/', views.update_player, name='update_player'),
-    path('player/<int:id>/delete/', views.delete_player, name='delete_player'),
+## CRUD Operations
 
-    # Coach CRUD
-    path('coach/create/', views.create_coach, name='create_coach'),
-    path('coach/<int:id>/', views.coach_detail, name='coach_detail'),
-    path('coach/<int:id>/update/', views.update_coach, name='update_coach'),
-    path('coach/<int:id>/delete/', views.delete_coach, name='delete_coach'),
+Each model has its own set of CRUD operations to manage the data. Below are the URLs for the CRUD views of each model:
 
-Our project also has search system:
+      Sport CRUD
+      - Create:       /sport/create/
+      - Detail:       /sport/<int:id>/
+      - Update:       /sport/<int:id>/update/
+      - Delete:       /sport/<int:id>/delete/
+
+
+      League CRUD
+      - Create:       /league/create/
+      - Detail:       /league/<int:id>/
+      - Update:       /league/<int:id>/update/
+      - Delete:       /league/<int:id>/delete/
+
+
+      Team CRUD
+      - Create:       /team/create/
+      - Detail:       /team/<int:id>/
+      - Update:       /team/<int:id>/update/
+      - Delete:       /team/<int:id>/delete/
+
+
+      Player CRUD
+      - Create:       /player/create/
+      - Detail:       /player/<int:id>/
+      - Update:       /player/<int:id>/update/
+      - Delete:       /player/<int:id>/delete/
+
+      Coach CRUD
+      - Create:       /coach/create/
+      - Detail:       /coach/<int:id>/
+      - Update:       /coach/<int:id>/update/
+      - Delete:       /coach/<int:id>/delete/
+
+
+
+## Global Search
+
+A search system allows users to search across all sports, teams, players, and coaches.
+
+The search logic:
 
     def global_search(request):
     query = request.GET.get('q')
@@ -94,3 +105,16 @@ Our project also has search system:
         'coaches': coaches
     }
     return render(request, 'scores/search_results.html', context)
+
+# 2. Users Application
+
+This app is focused on user authentication and profile management. It provides:
+
+      User Registration: Users can create a profile.
+      Login/Logout System: Registered users can log in to access additional features.
+      Profile Management: Users can view and edit their profile details.
+      
+User Registration & Authentication
+
+      Users can sign up, log in, and log out.
+      Profile management allows users to modify their personal information.
