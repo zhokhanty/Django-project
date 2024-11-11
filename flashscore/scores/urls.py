@@ -2,20 +2,18 @@ from django.urls import path
 from . import views
 from django.conf.urls.static import static
 from django.conf import settings
-# from .views import TeamDetailView, PlayerDetailView, CoachDetailView, LeagueTableView
-
 
 urlpatterns = [
     path('', views.home, name='home'),
     # Sport CRUD
     path('sport/create/', views.create_sport, name='create_sport'),
-    path('sport/<int:id>/', views.sport_detail, name='sport_detail'),
+    path('sport/<str:strSport>/', views.sport_detail, name='sport_detail'),
     path('sport/<int:id>/update/', views.update_sport, name='update_sport'),
     path('sport/<int:id>/delete/', views.delete_sport, name='delete_sport'),
 
     # League CRUD
     path('league/create/', views.create_league, name='create_league'),
-    path('league/<int:id>/', views.league_detail, name='league_detail'),
+    path('league/<str:strLeague>/', views.league_detail, name='league_detail'),
     path('league/<int:id>/update/', views.update_league, name="update_league"),
     path('league/<int:id>/delete/', views.delete_league, name="delete_league"),
 

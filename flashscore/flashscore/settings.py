@@ -121,3 +121,6 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'
+
+THE_SPORTS_DB_API_URL = "https://www.thesportsdb.com/api/v1/json/3/"
+THE_SPORTS_DB_API_KEY = "3"

@@ -38,22 +38,26 @@
 
     <div class="row">
         {% if sports %}
-        {% for sport in sports %}
-        <div class="col-md-4 mb-4">
-            <div class="card">
-                <img src="{{ sport.icon.url }}" alt="{{ sport.name }} icon" class="card-img-top" style="width: 100px; height: 100px; margin: auto;">
-                <div class="card-body text-center">
-                    <h5 class="card-title">
-                        <a href="{% url 'sport_detail' sport.id %}" class="text-decoration-none">{{ sport.name }}</a>
-                    </h5>
+            {% for sport in sports %}
+            <div class="col-md-4 mb-4">
+                <div class="card">
+                    <div class="card-body text-center">
+                        <p>
+                            <img src="{{ sport.strSportThumb }}" alt="{{ sport.strSport }} icon" width="50">
+                        </p>
+                        <h5 class="card-title">
+                            <a href="{% url 'sport_detail' sport.strSport %}" class="text-decoration-none">
+                                {{ sport.strSport }}
+                            </a>
+                        </h5>
+                    </div>
                 </div>
             </div>
-        </div>
-        {% endfor %}
+            {% endfor %}
         {% else %}
-        <div class="alert alert-warning w-100 text-center">
-            No sports found.
-        </div>
+            <div class="alert alert-warning w-100 text-center">
+                No sports found.
+            </div>
         {% endif %}
     </div>
 </div>

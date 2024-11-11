@@ -2,13 +2,14 @@ import json
 from django.http import Http404, JsonResponse
 from django.shortcuts import render, get_object_or_404
 from django.urls import reverse_lazy
+from .services import fetch_sports_data, fetch_leagues_by_sport, fetch_teams_by_league
 from .models import Sport, League, Team, Player, Coach
 from .forms import SportForm
 from django.db.models import F
 from django.views.decorators.csrf import csrf_exempt
 
 def home(request):
-    sports = Sport.objects.all()
+    sports = fetch_sports_data()
     context = {
         'sports': sports,
     }
@@ -29,9 +30,12 @@ def create_sport(request):
             'icon': sport.icon.url if sport.icon else None
         }, status=201)
     
-def sport_detail(request, id):
-    sport = get_object_or_404(Sport, id=id)
-    leagues = sport.leagues.all()
+def sport_detail(request, strSport):
+    sport = fetch_sports_data()
+    leagues = fetch_leagues_by_sport(strSport)
+    if not leagues:
+        raise Http404("Leagues not found for the specified sport.")
+    
     return render(request, 'scores/sport_detail.html', {'sport': sport, 'leagues': leagues})
 
 @csrf_exempt
@@ -86,17 +90,14 @@ def create_league(request):
             'sport_id': league.sport.id
         }, status=201)
     
-def league_detail(request, id):
-    league = League.objects.get(id=id)
+def league_detail(request, strLeague):
+    teams = fetch_teams_by_league(strLeague)
+    league = get_object_or_404(League, name=strLeague)
 
-
-    if id == 4:
-        league_table_entries = Team.objects.filter(leagues=league).order_by('-points_c')
-    else:
-        league_table_entries = Team.objects.filter(leagues=league).order_by('-points_l')
-
+    league_table_entries = Team.objects.filter(league=league).order_by('-points_c')
+    
     context = {
-        'league': league,
+        'teams': teams,
         'league_table_entries': league_table_entries,
     }
     return render(request, 'scores/league_detail.html', context)
