@@ -331,6 +331,7 @@ def global_search(request):
         'players': players,
         'coaches': coaches
     }
+<<<<<<< HEAD
     return render(request, 'scores/search_results.html', context)
 
 
@@ -346,3 +347,6 @@ def league_table_view(request, league_id):
         'teams': teams,
     }
     return render(request, 'scores/league_table.html', context)
+=======
+    return render(request, 'scores/search_results.html', context)
+>>>>>>> 69fb49fd9b086aab8df72868e46cb86f3f929080

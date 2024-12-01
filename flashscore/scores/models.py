@@ -22,7 +22,11 @@ class Team(models.Model):
     leagues = models.ManyToManyField('League', related_name='teams')
     points_l = models.IntegerField(default=0)
     points_c = models.IntegerField(default=0)
+<<<<<<< HEAD
     position = models.IntegerField(null=True, blank=True)
+=======
+
+>>>>>>> 69fb49fd9b086aab8df72868e46cb86f3f929080
     def __str__(self):
         return self.name
 

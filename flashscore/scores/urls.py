@@ -5,8 +5,11 @@ from django.conf import settings
 
 urlpatterns = [
     path('', views.home, name='home'),
+<<<<<<< HEAD
 
     path('league/<int:league_id>/table/', views.league_table_view, name='league_table'),
+=======
+>>>>>>> 69fb49fd9b086aab8df72868e46cb86f3f929080
     # Sport CRUD
     path('sport/create/', views.create_sport, name='create_sport'),
     path('sport/<str:strSport>/', views.sport_detail, name='sport_detail'),
