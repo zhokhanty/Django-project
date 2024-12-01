@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{ team.name }}</title>
+
+  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+
+    body {
+      background-color: #f8f9fa;
+    }
+    .team-header {
+      background-color: #007bff;
+      color: white;
+      padding: 20px;
+      border-radius: 5px;
+      text-align: center;
+    }
+    .info-block {
+      background-color: #ffffff;
+      border: 1px solid #dee2e6;
+      border-radius: 5px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+    .info-block h3 {
+      margin-top: 0;
+    }
+  </style>
+</head>
+<body>
+<div class="container mt-5">
+  <div class="team-header">
+    <h1 class="m-0">{{ team.name }}</h1>
+  </div>
+
+
+  <div class="info-block mt-4">
+    <h3>Coach</h3>
+    {% if team.coach %}
+    <ul class="list-group-item">
+      <a href="{% url 'coach_detail' team.coach.id %}" class="text-decoration-none">{{ team.coach.firstname }} {{ team.coach.lastname }}</a>
+    </ul>
+
+    {% else %}
+    <div class="alert alert-warning" role="alert">
+      No coach assigned to this team.
+    </div>
+    {% endif %}
+  </div>
+
+
+  <div class="info-block">
+    <h3>Players</h3>
+    {% if team.players.all %}
+    <ul class="list-group">
+      {% for player in team.players.all %}
+      <li class="list-group-item">
+        <a href="{% url 'player_detail' player.id %}" class="text-decoration-none">{{ player.firstname }} {{ player.lastname }}</a>  <!-- Link to player detail -->
+      </li>
+      {% endfor %}
+    </ul>
+    {% else %}
+    <div class="alert alert-warning" role="alert">
+      No players available for this team.
+    </div>
+    {% endif %}
+  </div>
+</div>
+
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

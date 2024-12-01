@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ league.name }}</title>
+
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<div class="container mt-5">
+    <h1 class="text-center">{{ league.name }}</h1>
+    <div class="text-center mb-4">
+        <img src="{{ league.icon.url }}" alt="{{ league.name }} icon" style="width: 50px; height: 50px;">
+    </div>
+
+    <h2 class="mt-4">League Table</h2>
+    {% if league_table_entries %}
+    <ul class="list-group">
+        {% for team in league_table_entries %}
+        <li class="list-group-item">
+            {% if league.id == 4 %}
+                <a href="{% url 'team_detail' team.id %}" class="text-decoration-none">{{ team.name }}</a> {{ team.points_c }}
+            {% else %}
+                <a href="{% url 'team_detail' team.id %}" class="text-decoration-none">{{ team.name }}</a> {{ team.points_l }}
+            {% endif %}
+        </li>
+        {% endfor %}
+    </ul>
+    {% else %}
+    <div class="alert alert-warning" role="alert">
+        No teams available for this league.
+    </div>
+    {% endif %}
+
+</div>
+
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
