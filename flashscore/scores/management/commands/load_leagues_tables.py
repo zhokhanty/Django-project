@@ -2,6 +2,7 @@ import requests
 from django.core.management.base import BaseCommand
 from scores.models import Sport, League, Team
 import json
+from django.core.files.base import ContentFile
 
 # Данные о лигах
 LEAGUES = {
@@ -14,42 +15,42 @@ LEAGUES = {
 
 API_URL = "https://www.thesportsdb.com/api/v1/json/3/lookuptable.php"
 
-
 class Command(BaseCommand):
-    help = "Загружает таблицы футбольных лиг из API"
+    help = "Загружает таблицы футбольных лиг из API и обновляет существующие команды"
 
     def handle(self, *args, **kwargs):
         football, _ = Sport.objects.get_or_create(name="Football")
 
         for league_name, league_id in LEAGUES.items():
-            # Получение или создание лиги
             league, _ = League.objects.get_or_create(name=league_name, sport=football)
 
-            # Запрос к API
             response = requests.get(API_URL, params={"l": league_id, "s": "2024-2025"})
             data = response.json()
 
             if data and "table" in data:
                 for team_data in data["table"]:
                     try:
-                        # Извлечение данных из API
                         team_name = team_data["strTeam"]
-                        team_badge = team_data.get("strBadge")  # Значение может быть пустым
+                        team_badge_url = team_data.get("strTeamBadge")
                         points = int(team_data["intPoints"])
-                        position = int(team_data["intRank"])
 
-                        # Получение или создание команды
-                        team, _ = Team.objects.get_or_create(name=team_name)
-                        if team_badge:  # Если эмблема доступна, добавляем её
-                            team.icon = team_badge
+                        team, created = Team.objects.get_or_create(name=team_name)
+
+                        if created or not team.icon:
+                            if team_badge_url:
+                                badge_response = requests.get(team_badge_url)
+                                if badge_response.status_code == 200:
+                                    file_name = f"{team_name.replace(' ', '_')}_badge.jpg"
+                                    team.icon.save(file_name, ContentFile(badge_response.content), save=False)
+
                         team.points_l = points
                         team.save()
 
-                        # Добавление команды в лигу
-                        team.leagues.add(league)
+                        if league not in team.leagues.all():
+                            team.leagues.add(league)
 
-                        # Логирование успешной обработки команды
-                        self.stdout.write(self.style.SUCCESS(f"Команда {team_name} добавлена в {league_name}."))
+                        action = "created" if created else "updated"
+                        self.stdout.write(self.style.SUCCESS(f"Team {team_name} {action} в {league_name}."))
                     except KeyError as e:
                         self.stdout.write(self.style.ERROR(f"Пропущен ключ {e} в данных команды: {team_data}"))
             else:

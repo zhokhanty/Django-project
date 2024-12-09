@@ -1,321 +1,266 @@
-import json
-from django.http import Http404, JsonResponse
-from django.shortcuts import render, get_object_or_404
-from django.urls import reverse_lazy
-from .services import fetch_sports_data, fetch_leagues_by_sport, fetch_teams_by_league
 from .models import Sport, League, Team, Player, Coach
-from .forms import SportForm
-from django.db.models import F
+from django.shortcuts import render, get_object_or_404, redirect
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.views.decorators.csrf import csrf_exempt
+from .forms import SportForm, LeagueForm, TeamForm, PlayerForm, CoachForm
+import requests
+from django.shortcuts import render
+from django.http import JsonResponse
 
-def home(request):
-    sports = fetch_sports_data()
-    context = {
-        'sports': sports,
-    }
-    return render(request, 'scores/home.html', context)
+def check_role(user, role):
+    profile = getattr(user, 'profile', None)
+    return profile and profile.role == role
 
-# Sport CRUD
+def load_all_sports(request):
+    try:
+        # Fetch data from the API
+        url = f"{API_BASE_URL}all_sports.php"
+        response = requests.get(url)
+
+        if response.status_code == 200:
+            # Parse the API response
+            sports_data = response.json().get('sports', [])
+            
+            # Save sports into the database (avoid duplicates)
+            for sport in sports_data:
+                Sport.objects.get_or_create(name=sport['strSport'])
+            
+            # Fetch all sports from the database
+            sports = Sport.objects.all()
+
+            # Render sports to the template
+            return render(request, 'sports/home.html', {'sports': sports})
+        else:
+            # Handle API errors
+            return JsonResponse({'error': 'Failed to fetch sports from API'}, status=response.status_code)
+    except Exception as e:
+        # Catch unexpected exceptions
+        return JsonResponse({'error': str(e)}, status=500)
+
+def sport_detail(request, sport_id):
+    sport = get_object_or_404(Sport, id=sport_id)
+    return render(request, 'sports/sport_detail.html', {'sport': sport})
+
 @csrf_exempt
-def create_sport(request):
+@login_required
+@user_passes_test(lambda u: check_role(u, 'admin'))
+def sport_create(request):
     if request.method == 'POST':
-        data = json.loads(request.body)
-        sport = Sport.objects.create(
-            name=data.get("name"),
-            icon=data.get("icon")
-        )
-        return JsonResponse({
-            'id': sport.id,
-            'name': sport.name,
-            'icon': sport.icon.url if sport.icon else None
-        }, status=201)
-    
-def sport_detail(request, strSport):
-    sport = fetch_sports_data()
-    leagues = fetch_leagues_by_sport(strSport)
-    if not leagues:
-        raise Http404("Leagues not found for the specified sport.")
-    
-    return render(request, 'scores/sport_detail.html', {'sport': sport, 'leagues': leagues})
+        form = SportForm(request.POST, request.FILES)
+        if form.is_valid():
+            form.save()
+            return redirect('sport_list')
+    else:
+        form = SportForm()
+    return render(request, 'sports/sport_form.html', {'form': form})
 
 @csrf_exempt
-def update_sport(request, id):
-    if request.method == 'PUT':
-        sport = get_object_or_404(Sport, id=id)
-        data = json.loads(request.body)
-        
-        # Updating fields
-        sport.name = data.get("name", sport.name)
-        sport.icon = data.get("icon", sport.icon)
-        
-        sport.save()
-        
-        return JsonResponse({
-            'id': sport.id,
-            'name': sport.name,
-            'icon': sport.icon.url if sport.icon else None
-        })
+@login_required
+@user_passes_test(lambda u: check_role(u, 'admin'))
+def sport_update(request, sport_id):
+    sport = get_object_or_404(Sport, id=sport_id)
+    if request.method == 'POST':
+        form = SportForm(request.POST, request.FILES, instance=sport)
+        if form.is_valid():
+            form.save()
+            return redirect('sport_list')
+    else:
+        form = SportForm(instance=sport)
+    return render(request, 'sports/sport_form.html', {'form': form})
 
 @csrf_exempt
-def delete_sport(request, id):
-    if request.method == 'DELETE':
-        sport = get_object_or_404(Sport, id=id)
+@login_required
+@user_passes_test(lambda u: check_role(u, 'admin'))
+def sport_delete(request, sport_id):
+    sport = get_object_or_404(Sport, id=sport_id)
+    if request.method == 'POST':
         sport.delete()
-        return JsonResponse({'message': 'Sport deleted successfully'}, status=204)
-    
-# League CRUD
+        return redirect('sport_list')
+    return render(request, 'sports/sport_confirm_delete.html', {'sport': sport})
+
+
+# League Views
+def league_list(request):
+    leagues = League.objects.all()
+    return render(request, 'leagues/league_list.html', {'leagues': leagues})
+
+def league_detail(request, league_id):
+    league = get_object_or_404(League, id=league_id)
+    return render(request, 'leagues/league_detail.html', {'league': league})
+
 @csrf_exempt
-def create_league(request):
+@login_required
+@user_passes_test(lambda u: check_role(u, 'admin'))
+def league_create(request):
     if request.method == 'POST':
-        data = json.loads(request.body)
-
-        sport_id = data.get("id")
-        if sport_id is None:
-            return JsonResponse({'error': 'sport_id is required'}, status=400)
-
-        try:
-            sport = get_object_or_404(Sport, id=sport_id)
-        except Http404:
-            return JsonResponse({'error': 'Sport not found'}, status=404)
-
-        league = League.objects.create(
-            name=data.get("name"),
-            icon=data.get("icon"),
-            sport=sport
-        )
-        return JsonResponse({
-            'id': league.id,
-            'name': league.name,
-            'icon': league.icon.url if league.icon else None,
-            'sport_id': league.sport.id
-        }, status=201)
-    
-def league_detail(request, strLeague):
-    teams = fetch_teams_by_league(strLeague)
-    league = get_object_or_404(League, name=strLeague)
-
-    league_table_entries = Team.objects.filter(league=league).order_by('-points_c')
-    
-    context = {
-        'teams': teams,
-        'league_table_entries': league_table_entries,
-    }
-    return render(request, 'scores/league_detail.html', context)
+        form = LeagueForm(request.POST, request.FILES)
+        if form.is_valid():
+            form.save()
+            return redirect('league_list')
+    else:
+        form = LeagueForm()
+    return render(request, 'leagues/league_form.html', {'form': form})
 
 @csrf_exempt
-def update_league(request, id):
-    if request.method == 'PUT':
-        league = get_object_or_404(League, id=id)
-        data = json.loads(request.body)
-        
-        league.name = data.get("name", league.name)
-        league.icon = data.get("icon", league.icon)
-        league.sport = get_object_or_404(Sport, id=data.get("sport_id", league.sport.id))
-        
-        league.save()
-        
-        return JsonResponse({
-            'id': league.id,
-            'name': league.name,
-            'icon': league.icon.url if league.icon else None,
-            'sport': league.sport.id
-        })
+@login_required
+@user_passes_test(lambda u: check_role(u, 'admin'))
+def league_update(request, league_id):
+    league = get_object_or_404(League, id=league_id)
+    if request.method == 'POST':
+        form = LeagueForm(request.POST, request.FILES, instance=league)
+        if form.is_valid():
+            form.save()
+            return redirect('league_list')
+    else:
+        form = LeagueForm(instance=league)
+    return render(request, 'leagues/league_form.html', {'form': form})
 
 @csrf_exempt
-def delete_league(request, id):
-    if request.method == 'DELETE':
-        league = get_object_or_404(League, id=id)
+@login_required
+@user_passes_test(lambda u: check_role(u, 'admin'))
+def league_delete(request, league_id):
+    league = get_object_or_404(League, id=league_id)
+    if request.method == 'POST':
         league.delete()
-        return JsonResponse({'message': 'League deleted successfully'}, status=204)
-    
-# Team CRUD 
+        return redirect('league_list')
+    return render(request, 'leagues/league_confirm_delete.html', {'league': league})
+
+
+# Team Views
+def team_list(request):
+    teams = Team.objects.all()
+    return render(request, 'teams/team_list.html', {'teams': teams})
+
+def team_detail(request, team_id):
+    team = get_object_or_404(Team, id=team_id)
+    return render(request, 'teams/team_detail.html', {'team': team})
+
 @csrf_exempt
-def create_team(request):
+@login_required
+@user_passes_test(lambda u: check_role(u, 'admin'))
+def team_create(request):
     if request.method == 'POST':
-        data = json.loads(request.body)
-        leagues = League.objects.filter(id__in=data.get("leagues", []))
-        team = Team.objects.create(
-            name=data.get("name"),
-            icon=data.get("icon"),
-            points_l=data.get("points_l", 0),
-            points_c=data.get("points_c", 0)
-        )
-        team.leagues.set(leagues)
-        return JsonResponse({
-            'id': team.id,
-            'name': team.name,
-            'icon': team.icon.url if team.icon else None,
-            'leagues': [league.id for league in team.leagues.all()],
-            'points_l': team.points_l,
-            'points_c': team.points_c
-        }, status=201)
-
-def team_detail(request, id):
-    team = get_object_or_404(Team, id=id)
-    players = team.players.all()
-    return render(request, 'scores/team_detail.html', {'team': team, 'players': players})
+        form = TeamForm(request.POST, request.FILES)
+        if form.is_valid():
+            form.save()
+            return redirect('team_list')
+    else:
+        form = TeamForm()
+    return render(request, 'teams/team_form.html', {'form': form})
 
 @csrf_exempt
-def update_team(request, id):
-    if request.method == 'PUT':
-        team = get_object_or_404(Team, id=id)
-        data = json.loads(request.body)
-        
-        team.name = data.get("name", team.name)
-        team.icon = data.get("icon", team.icon)
-        team.points_l = data.get("points_l", team.points_l)
-        team.points_c = data.get("points_c", team.points_c)
-        
-        leagues = League.objects.filter(id__in=data.get("leagues", []))
-        team.leagues.set(leagues)
-        
-        team.save()
-        
-        return JsonResponse({
-            'id': team.id,
-            'name': team.name,
-            'icon': team.icon.url if team.icon else None,
-            'leagues': [league.id for league in team.leagues.all()],
-            'points_l': team.points_l,
-            'points_c': team.points_c
-        })
+@login_required
+@user_passes_test(lambda u: check_role(u, 'admin'))
+def team_update(request, team_id):
+    team = get_object_or_404(Team, id=team_id)
+    if request.method == 'POST':
+        form = TeamForm(request.POST, request.FILES, instance=team)
+        if form.is_valid():
+            form.save()
+            return redirect('team_list')
+    else:
+        form = TeamForm(instance=team)
+    return render(request, 'teams/team_form.html', {'form': form})
 
 @csrf_exempt
-def delete_team(request, id):
-    if request.method == 'DELETE':
-        team = get_object_or_404(Team, id=id)
+@login_required
+@user_passes_test(lambda u: check_role(u, 'admin'))
+def team_delete(request, team_id):
+    team = get_object_or_404(Team, id=team_id)
+    if request.method == 'POST':
         team.delete()
-        return JsonResponse({'message': 'Team deleted successfully'}, status=204)
+        return redirect('team_list')
+    return render(request, 'teams/team_confirm_delete.html', {'team': team})
 
-# Player CRUD
-@csrf_exempt
-def create_player(request):
+
+# Player Views
+def player_list(request):
+    players = Player.objects.all()
+    return render(request, 'players/player_list.html', {'players': players})
+
+def player_detail(request, player_id):
+    player = get_object_or_404(Player, id=player_id)
+    return render(request, 'players/player_detail.html', {'player': player})
+
+@login_required
+@user_passes_test(lambda u: check_role(u, 'admin'))
+def player_create(request):
     if request.method == 'POST':
-        data = json.loads(request.body)
+        form = PlayerForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('player_list')
+    else:
+        form = PlayerForm()
+    return render(request, 'players/player_form.html', {'form': form})
 
-        team_id = data.get("id")
-        if team_id is None:
-            return JsonResponse({'error': 'team_id is required'}, status=400)
+@login_required
+@user_passes_test(lambda u: check_role(u, 'admin'))
+def player_update(request, player_id):
+    player = get_object_or_404(Player, id=player_id)
+    if request.method == 'POST':
+        form = PlayerForm(request.POST, instance=player)
+        if form.is_valid():
+            form.save()
+            return redirect('player_list')
+    else:
+        form = PlayerForm(instance=player)
+    return render(request, 'players/player_form.html', {'form': form})
 
-        try:
-            team = get_object_or_404(Team, id=team_id)
-        except Http404:
-            return JsonResponse({'error': 'Team not found'}, status=404)
-        
-        player = Player.objects.create(
-            firstname=data.get("firstname"),
-            lastname=data.get("lastname"),
-            num_of_player=data.get("num_of_player"),
-            position=data.get("position"),
-            date_of_birth=data.get("date_of_birth"),
-            team=team
-        )
-        return JsonResponse({
-            'id': player.id,
-            'name': f"{player.firstname} {player.lastname}",
-            'num_of_player': player.num_of_player,
-            'position': player.position,
-            'date_of_birth': player.date_of_birth,
-            'team': player.team.id
-        }, status=201)
-
-def player_detail(request, id):
-    player = get_object_or_404(Player, id=id)
-    return render(request, 'scores/player_detail.html', {"player": player})
-
-@csrf_exempt
-def update_player(request, id):
-    if request.method == 'PUT':
-        player = get_object_or_404(Player, id=id)
-        data = json.loads(request.body)
-        
-        player.firstname = data.get("firstname", player.firstname)
-        player.lastname = data.get("lastname", player.lastname)
-        player.num_of_player = data.get("num_of_player", player.num_of_player)
-        player.position = data.get("position", player.position)
-        player.date_of_birth = data.get("date_of_birth", player.date_of_birth)
-        player.team = get_object_or_404(Team, id=data.get("team_id", player.team.id))
-        
-        player.save()
-        
-        return JsonResponse({
-            'id': player.id,
-            'name': f"{player.firstname} {player.lastname}",
-            'num_of_player': player.num_of_player,
-            'position': player.position,
-            'date_of_birth': player.date_of_birth,
-            'team': player.team.id
-        })
-
-@csrf_exempt
-def delete_player(request, id):
-    if request.method == 'DELETE':
-        player = get_object_or_404(Player, id=id)
+@login_required
+@user_passes_test(lambda u: check_role(u, 'admin'))
+def player_delete(request, player_id):
+    player = get_object_or_404(Player, id=player_id)
+    if request.method == 'POST':
         player.delete()
-        return JsonResponse({'message': 'Player deleted successfully'}, status=204)
+        return redirect('player_list')
+    return render(request, 'players/player_confirm_delete.html', {'player': player})
 
-# Coach CRUD
-@csrf_exempt
-def create_coach(request):
+
+# Coach Views
+def coach_list(request):
+    coaches = Coach.objects.all()
+    return render(request, 'coaches/coach_list.html', {'coaches': coaches})
+
+def coach_detail(request, coach_id):
+    coach = get_object_or_404(Coach, id=coach_id)
+    return render(request, 'coaches/coach_detail.html', {'coach': coach})
+
+@login_required
+@user_passes_test(lambda u: check_role(u, 'admin'))
+def coach_create(request):
     if request.method == 'POST':
-        data = json.loads(request.body)
+        form = CoachForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('coach_list')
+    else:
+        form = CoachForm()
+    return render(request, 'coaches/coach_form.html', {'form': form})
 
-        team_id = data.get("id")
-        if team_id is None:
-            return JsonResponse({'error': 'team_id is required'}, status=400)
+@login_required
+@user_passes_test(lambda u: check_role(u, 'admin'))
+def coach_update(request, coach_id):
+    coach = get_object_or_404(Coach, id=coach_id)
+    if request.method == 'POST':
+        form = CoachForm(request.POST, instance=coach)
+        if form.is_valid():
+            form.save()
+            return redirect('coach_list')
+    else:
+        form = CoachForm(instance=coach)
+    return render(request, 'coaches/coach_form.html', {'form': form})
 
-        try:
-            team = get_object_or_404(Team, id=team_id)
-        except Http404:
-            return JsonResponse({'error': 'Team not found'}, status=404)
-        
-        coach = Coach.objects.create(
-            firstname=data.get("firstname"),
-            lastname=data.get("lastname"),
-            date_of_birth=data.get("date_of_birth"),
-            exp=data.get("exp"),
-            team=team
-        )
-        return JsonResponse({
-            'id': coach.id,
-            'name': f"{coach.firstname} {coach.lastname}",
-            'date_of_birth': coach.date_of_birth,
-            'exp': coach.exp,
-            'team': coach.team.id
-        }, status=201)
-
-def coach_detail(request, id):
-    coach = get_object_or_404(Coach, id=id)
-    return render(request, 'scores/coach_detail.html', {'coach': coach})
-
-@csrf_exempt
-def update_coach(request, id):
-    if request.method == 'PUT':
-        coach = get_object_or_404(Coach, id=id)
-        data = json.loads(request.body)
-        
-        coach.firstname = data.get("firstname", coach.firstname)
-        coach.lastname = data.get("lastname", coach.lastname)
-        coach.date_of_birth = data.get("date_of_birth", coach.date_of_birth)
-        coach.exp = data.get("exp", coach.exp)
-        coach.team = get_object_or_404(Team, id=data.get("team_id", coach.team.id))
-        
-        coach.save()
-        
-        return JsonResponse({
-            'id': coach.id,
-            'name': f"{coach.firstname} {coach.lastname}",
-            'date_of_birth': coach.date_of_birth,
-            'exp': coach.exp,
-            'team': coach.team.id
-        })
-
-@csrf_exempt
-def delete_coach(request, id):
-    if request.method == 'DELETE':
-        coach = get_object_or_404(Coach, id=id)
+# Delete Coach (Restricted to Admins)
+@login_required
+@user_passes_test(lambda u: check_role(u, 'admin'))
+def coach_delete(request, coach_id):
+    coach = get_object_or_404(Coach, id=coach_id)
+    if request.method == 'POST':
         coach.delete()
-        return JsonResponse({'message': 'Coach deleted successfully'}, status=204)
+        return redirect('coach_list')
+    return render(request, 'coaches/coach_confirm_delete.html', {'coach': coach})
+
 
 def global_search(request):
     query = request.GET.get('q')
@@ -331,22 +276,37 @@ def global_search(request):
         'players': players,
         'coaches': coaches
     }
-<<<<<<< HEAD
+
     return render(request, 'scores/search_results.html', context)
 
+API_BASE_URL = "https://www.thesportsdb.com/api/v1/json/3/"
 
-def league_table_view(request, league_id):
-    """
-    Отображение таблицы выбранной лиги.
-    """
-    league = get_object_or_404(League, id=league_id)
-    teams = league.teams.order_by('-points_l', 'name')  # Сортировка по очкам и алфавиту
 
-    context = {
-        'league': league,
-        'teams': teams,
-    }
-    return render(request, 'scores/league_table.html', context)
-=======
-    return render(request, 'scores/search_results.html', context)
->>>>>>> 69fb49fd9b086aab8df72868e46cb86f3f929080
+
+def list_leagues(request):
+    url = f"{API_BASE_URL}all_leagues.php"
+    response = requests.get(url)
+    if response.status_code == 200:
+        data = response.json().get('leagues', [])
+        return render(request, 'sports/list_leagues.html', {'leagues': data})
+    return JsonResponse({'error': 'Unable to fetch leagues'}, status=500)
+
+def leagues_by_country(request, country, sport=None):
+    url = f"{API_BASE_URL}search_all_leagues.php?c={country}"
+    if sport:
+        url += f"&s={sport}"
+    response = requests.get(url)
+    if response.status_code == 200:
+        data = response.json().get('countrys', [])
+        return render(request, 'sports/leagues_by_country.html', {'leagues': data, 'country': country})
+    return JsonResponse({'error': 'Unable to fetch leagues'}, status=500)
+
+def teams_in_league(request, league_name, country=None):
+    url = f"{API_BASE_URL}search_all_teams.php?l={league_name}"
+    if country:
+        url += f"&c={country}"
+    response = requests.get(url)
+    if response.status_code == 200:
+        data = response.json().get('teams', [])
+        return render(request, 'sports/teams_in_league.html', {'teams': data, 'league': league_name})
+    return JsonResponse({'error': 'Unable to fetch teams'}, status=500)

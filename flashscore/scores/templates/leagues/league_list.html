@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ sport.name }}</title>
+    <title>{{ league.name }}</title>
 
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <style>
@@ -11,7 +11,7 @@
         body {
             background-color: #f8f9fa;
         }
-        .sport-header {
+        .league-header {
             background-color: #007bff;
             color: white;
             padding: 20px;
@@ -19,10 +19,10 @@
             display: flex;
             align-items: center;
         }
-        .sport-header img {
+        .league-header img {
             margin-left: 15px;
         }
-        .league-list {
+        .team-list {
             margin-top: 20px;
         }
     </style>
@@ -30,18 +30,18 @@
 <body>
 <div class="container mt-5">
     <div class="sport-header">
-        <h1 class="m-0">{{ sport.name }}</h1>
-        <img src="{{ sport.strSportThumb }}" alt="{{ sport.name }} icon" style="width: 50px; height: 50px;">
+        <h1 class="m-0">{{ league.name }}</h1>
+        <img src="{{ league.strSportThumb }}" alt="{{ league.name }} icon" style="width: 50px; height: 50px;">
     </div>
 
-    <h2 class="mt-4">Leagues</h2>
-    {% if leagues %}
-    <ul class="list-group league-list">
-        {% for league in leagues %}
+    <h2 class="mt-4">Teams</h2>
+    {% if teams %}
+    <ul class="list-group team-list">
+        {% for team in teams %}
         <li class="list-group-item d-flex justify-content-between align-items-center">
-            {% if league.strSport == strSport %}
-            <a href="{% url 'league_detail' league.strLeague %}" class="text-decoration-none">
-                {{ league.strLeague }}
+            {% if team.id == id %}
+            <a href="{% url 'team' league.id %}" class="text-decoration-none">
+                {{ team.id }}
             </a>
             {% endif %}
             <img src="{{ league.icon.url }}" alt="{{ league.name }} icon" style="width: 30px; height: 30px;">

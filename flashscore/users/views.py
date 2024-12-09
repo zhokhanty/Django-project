@@ -2,18 +2,30 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from rest_framework.views import APIView
+from rest_framework_simplejwt.views import TokenObtainPairView
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from .forms import RegistrationForm, LoginForm
 from .models import Profile
 from scores.models import Team
+
+class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
+    @classmethod
+    def get_token(cls, user):
+        token = super().get_token(user)
+        token['role'] = getattr(user.profile, 'role', 'unknown')
+        token['username'] = user.username
+        return token
+
+class CustomTokenObtainPairView(TokenObtainPairView):
+    serializer_class = CustomTokenObtainPairSerializer
 
 def register_view(request):
     if request.method == 'POST':
         form = RegistrationForm(request.POST)
         if form.is_valid():
             user = form.save(commit=False)
-            user.set_password(form.cleaned_data['password'])
             user.save()
-            messages.success(request, "Registration successful. You can now log in.")
             return redirect('login')
     else:
         form = RegistrationForm()
@@ -28,7 +40,7 @@ def login_view(request):
             user = authenticate(request, username=username, password=password)
             if user is not None:
                 login(request, user)
-                return redirect('home')
+                return redirect('sport_list')
             else:
                 messages.error(request, "Invalid credentials.")
     else:
@@ -51,7 +63,8 @@ def profile_view(request):
         'profile': profile,
         'teams': teams,
     })
+
 def logout_view(request):
     logout(request)
     messages.info(request, "You have successfully logged out.")
-    return redirect('home')
+    return redirect('sport_list')

@@ -43,11 +43,11 @@
                 <div class="card">
                     <div class="card-body text-center">
                         <p>
-                            <img src="{{ sport.strSportThumb }}" alt="{{ sport.strSport }} icon" width="50">
+                            <img src="{{ sport.strSportThumb }}" alt="{{ sport.name }} icon" width="50">
                         </p>
                         <h5 class="card-title">
-                            <a href="{% url 'sport_detail' sport.strSport %}" class="text-decoration-none">
-                                {{ sport.strSport }}
+                            <a href="{% url 'sport_detail' sport.id %}" class="text-decoration-none">
+                                {{ sport.name }}
                             </a>
                         </h5>
                     </div>
@@ -59,6 +59,11 @@
                 No sports found.
             </div>
         {% endif %}
+    </div>
+
+    {% if user.is_authenticated and user.profile.role == 'admin' %}
+    <a href="{% url 'sport_create' %}">Create New Sport</a>
+    {% endif %}
     </div>
 </div>
 
