@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'scores',
     'media',
     'news',
+    'drf_yasg',
 ]
 
 MIDDLEWARE = [
