@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ league.name }} - Таблица</title>
+</head>
+<body>
+    <h1>Таблица: {{ league.name }}</h1>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Позиция</th>
+                <th>Команда</th>
+                <th>Очки</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for team in teams %}
+            <tr>
+                <td>{{ forloop.counter }}</td>
+                <td>
+                    {% if team.icon %}
+                    <img src="{{ team.icon.url }}" alt="{{ team.name }}" width="20" height="20">
+                    {% endif %}
+                    {{ team.name }}
+                </td>
+                <td>{{ team.points_l }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>

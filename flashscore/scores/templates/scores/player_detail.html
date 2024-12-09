@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ player.firstname }} {{ player.lastname }}</title>
+
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+
+        body {
+            background-color: #f8f9fa;
+        }
+        .player-header {
+            background-color: #007bff;
+            color: white;
+            padding: 20px;
+            border-radius: 5px;
+            text-align: center;
+        }
+        .player-info {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+<div class="container mt-5">
+    <div class="player-header">
+        <h1 class="m-0">{{ player.firstname }} {{ player.lastname }}</h1>
+    </div>
+
+    <div class="player-info">
+        <h2 class="mt-4">Player Details</h2>
+        <p><strong>Team:</strong> {{ player.team.name }}</p>
+        <p><strong>Number:</strong> {{ player.num_of_player }}</p>
+        <p><strong>Position:</strong> {{ player.position }}</p>
+        <p><strong>Date of Birth:</strong> {{ player.date_of_birth }}</p>
+    </div>
+</div>
+
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
