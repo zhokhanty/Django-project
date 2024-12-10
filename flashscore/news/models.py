@@ -18,6 +18,14 @@ class News(models.Model):
         return self.title
 
 
+class View(models.Model):
+    title = models.CharField(max_length=255, verbose_name="title")
+    content = models.TextField(verbose_name="content")
+    author = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name="author")
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="date of created")
+    class Meta:
+        verbose_name = "ViewComment"
+
 class Comment(models.Model):
     news = models.ForeignKey(News, on_delete=models.CASCADE, related_name="comments", verbose_name="news")
     author = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name="author")

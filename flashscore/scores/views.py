@@ -1,3 +1,5 @@
+from datetime import timezone
+
 from django.contrib.auth.decorators import login_required, user_passes_test
 from .forms import SportForm, LeagueForm, TeamForm, PlayerForm, CoachForm
 import requests
@@ -106,14 +108,23 @@ def sport_update(request, sport_id):
         form = SportForm(instance=sport)
     return render(request, 'sports/sport_form.html', {'form': form})
 
+
+from .models import Match
+
+
 def league_table_view(request, league_id):
     league = get_object_or_404(League, id=league_id)
     teams = league.teams.order_by('-points_l', 'name')
+    matches = Match.objects.filter(league=league).select_related('home_team', 'away_team')
+
+    # Формируем контекст для шаблона
     context = {
         'league': league,
         'teams': teams,
+        'matches': matches,
     }
     return render(request, 'scores/league_table.html', context)
+
 
 @csrf_exempt
 @login_required
@@ -125,7 +136,34 @@ def sport_delete(request, sport_id):
         return redirect('sport_list')
     return render(request, 'sports/sport_confirm_delete.html', {'sport': sport})
 
+def team_matches(request, team_id):
+    team = Team.objects.get(id=team_id)
+    matches = team.home_matches.all() | team.away_matches.all()  # Получаем все матчи, где команда была в домашней или выездной
+    return render(request, 'scores/team_matches.html', {'team': team, 'matches': matches})
 
+
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from .models import Team
+from .serializers import MatchSerializer
+
+class TeamMatchesAPI(APIView):
+    def get(self, request, team_id):
+        team = Team.objects.get(id=team_id)
+        matches = team.home_matches.all() | team.away_matches.all()
+        serializer = MatchSerializer(matches, many=True)
+        return Response(serializer.data)
+
+def team_detail(request, team_id):
+    team = Team.objects.get(id=team_id)
+    upcoming_matches = team.home_matches.filter(date__gt=timezone.now()) | team.away_matches.filter(date__gt=timezone.now())
+    past_matches = team.home_matches.filter(date__lt=timezone.now()) | team.away_matches.filter(date__lt=timezone.now())
+
+    return render(request, 'scores/team_detail.html', {
+        'team': team,
+        'upcoming_matches': upcoming_matches,
+        'past_matches': past_matches,
+    })
 # League Views
 def league_list(request):
     leagues = League.objects.all()

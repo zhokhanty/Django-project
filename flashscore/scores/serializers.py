@@ -6,6 +6,13 @@ class SportSerializer(serializers.ModelSerializer):
         model = Sport
         fields = '__all__'
 
+from rest_framework import serializers
+from .models import Match
+
+class MatchSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Match
+        fields = ['date', 'home_team', 'away_team', 'home_score', 'away_score']
 
 class LeagueSerializer(serializers.ModelSerializer):
     sport = serializers.StringRelatedField()

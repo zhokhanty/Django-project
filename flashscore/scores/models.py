@@ -1,3 +1,5 @@
+from datetime import timezone
+
 from django.db import models
 
 class Sport(models.Model):
@@ -23,6 +25,14 @@ class Team(models.Model):
     points_l = models.IntegerField(default=0)
     points_c = models.IntegerField(default=0)
 
+    @property
+    def upcoming_matches(self):
+        return self.match_set.filter(date__gte=timezone.now())
+
+    @property
+    def past_matches(self):
+        return self.match_set.filter(date__lt=timezone.now())
+
 class Player(models.Model):
     firstname = models.CharField(max_length=100)
     lastname = models.CharField(max_length=100)
@@ -44,3 +54,23 @@ class Coach(models.Model):
 
     def __str__(self):
         return f"{self.firstname} {self.lastname} - {self.team.name}"
+
+class Match(models.Model):
+    league = models.ForeignKey(League, on_delete=models.CASCADE)
+    home_team = models.ForeignKey(Team, related_name='home_matches', on_delete=models.CASCADE)
+    away_team = models.ForeignKey(Team, related_name='away_matches', on_delete=models.CASCADE)
+    home_score = models.IntegerField(null=True, blank=True)
+    away_score = models.IntegerField(null=True, blank=True)
+    round_number = models.IntegerField()
+    timestamp = models.DateTimeField()
+    status = models.CharField(max_length=50)
+    date = models.DateTimeField(null=True, blank=True)
+    video_url = models.URLField(null=True, blank=True)
+    round_number = models.IntegerField(null=True, blank=True)
+    home_team_badge = models.URLField(max_length=500, blank=True, null=True)  # Значок домашней команды
+    away_team_badge = models.URLField(max_length=500, blank=True, null=True)
+    def is_past(self):
+        return self.date < timezone.now()
+
+    def is_upcoming(self):
+        return self.date > timezone.now()

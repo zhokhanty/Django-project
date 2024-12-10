@@ -1,34 +1,35 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>News</title>
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-</head>
-<body>
-<div class="container mt-5">
-<a href="http://127.0.0.1:8000/sports/3/" class="btn btn-primary mt-3">Leagues</a>
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>News</title>
+        <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    </head>
+    <body>
+    <div class="container mt-5">
+    <a href="http://127.0.0.1:8000/sports/3/" class="btn btn-primary mt-3">Leagues</a>
+        <h1 class="text-center mb-4">Latest News</h1>
+        {% if request.user.role == 'journalist' %}
+            <a href="{% url 'create_news' %}" class="btn btn-primary mb-3">Add News</a>
+        {% endif %}
+        <div class="list-group">
+            {% for item in news %}
 
-    <h1 class="text-center mb-4">Latest News</h1>
-    {% if request.user.role == 'journalist' %}
-        <a href="{% url 'create_news' %}" class="btn btn-primary mb-3">Add News</a>
-    {% endif %}
-    <div class="list-group">
-        {% for item in news %}
+                <a href="{% url 'news_detail' item.id %}" class="list-group-item list-group-item-action">
 
-            <a href="{% url 'news_detail' item.id %}" class="list-group-item list-group-item-action">
+                <a href="#" class="list-group-item list-group-item-action">
 
-            <a href="#" class="list-group-item list-group-item-action">
+                    <h5 class="mb-1">{{ item.title }}</h5>
+                    <small>By {{ item.author }} | {{ item.created_at }}</small>
+                    <p class="mb-1">{{ item.content|truncatechars:100 }}</p>
+                </a>
+            {% endfor %}
+                <a href="{% url 'match_list' %}" class="btn btn-primary mt-3">View Matches</a>
 
-                <h5 class="mb-1">{{ item.title }}</h5>
-                <small>By {{ item.author }} | {{ item.created_at }}</small>
-                <p class="mb-1">{{ item.content|truncatechars:100 }}</p>
-            </a>
-        {% endfor %}
+        </div>
     </div>
-</div>
-</body>
-</html>
-</html>
+    </body>
+    </html>
+    </html>
 

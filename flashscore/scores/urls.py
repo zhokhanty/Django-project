@@ -5,6 +5,8 @@ from .views import analytics_view
 urlpatterns = [
     # Sports
     path('sports/', views.load_all_sports, name='sport_list'),
+    path('', views.load_all_sports, name='sport_list'),
+
     path('sports/<int:sport_id>/', views.sport_detail, name='sport_detail'),
     path('sports/create/', views.sport_create, name='sport_create'),
     path('sports/<int:sport_id>/update/', views.sport_update, name='sport_update'),
@@ -24,6 +26,8 @@ urlpatterns = [
     path('teams/<int:team_id>/update/', views.team_update, name='team_update'),
     path('teams/<int:team_id>/delete/', views.team_delete, name='team_delete'),
 
+    path('api/team/<int:team_id>/matches/', views.TeamMatchesAPI.as_view(), name='team_matches_api'),
+    path('team/<int:team_id>/matches/', views.team_matches, name='team_matches'),
     # Players
     path('players/', views.player_list, name='player_list'),
     path('players/<int:player_id>/', views.player_detail, name='player_detail'),

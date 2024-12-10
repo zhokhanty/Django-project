@@ -6,6 +6,13 @@ from users.models import Profile
 from django.shortcuts import render, get_object_or_404, redirect
 from .models import News, Comment
 
+from django.shortcuts import render
+from scores .models import Match
+
+def match_list(request):
+    # Получаем все матчи из базы данных
+    matches = Match.objects.all().order_by('timestamp')  # Можно отсортировать по дате или другим полям
+    return render(request, 'news/match_list.html', {'matches': matches})
 
 class tokenAuth(APIView):
     queryset = Profile.objects.all()

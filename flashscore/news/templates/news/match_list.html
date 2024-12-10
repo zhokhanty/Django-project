@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Match List</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<div class="container mt-5">
+    <a href="http://127.0.0.1:8000/sports/3/" class="btn btn-primary mt-3">Leagues</a>
+    <h1 class="text-center mb-4">Latest Matches</h1>
+
+    <div class="list-group">
+        {% for match in matches %}
+            <a href="#" class="list-group-item list-group-item-action">
+                <h5 class="mb-1">{{ match.home_team.name }} vs {{ match.away_team.name }}</h5>
+                <small>{{ match.timestamp|date:"Y-m-d H:i" }} | Round: {{ match.round_number }}</small>
+                <p class="mb-1">Score: {{ match.home_score }} - {{ match.away_score }}</p>
+                <p class="mb-1">Status: {{ match.status }}</p>
+                {% if match.video_url %}
+                    <a href="{{ match.video_url }}" target="_blank" class="btn btn-secondary btn-sm">Watch Video</a>
+                {% endif %}
+            </a>
+        {% endfor %}
+    </div>
+</div>
+</body>
+</html>
