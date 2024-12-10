@@ -11,6 +11,7 @@
     <h1 class="text-center mb-4">Edit News</h1>
     <form method="POST" class="border p-4 rounded shadow">
         {% csrf_token %}
+<<<<<<< HEAD
 
         <!-- Выводим ошибки формы -->
         {% if form.errors %}
@@ -35,3 +36,12 @@
 </div>
 </body>
 </html>
+=======
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary btn-block">Save Changes</button>
+    </form>
+    <a href="{% url 'news_list' %}" class="btn btn-secondary btn-block mt-3">Cancel</a>
+</div>
+</body>
+</html>
+>>>>>>> 92e5d838938e903183af260a9f86a9925a82d7c1

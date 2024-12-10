@@ -14,7 +14,11 @@
     {% endif %}
     <div class="list-group">
         {% for item in news %}
+<<<<<<< HEAD
             <a href="{% url 'news_detail' item.id %}" class="list-group-item list-group-item-action">
+=======
+            <a href="#" class="list-group-item list-group-item-action">
+>>>>>>> 92e5d838938e903183af260a9f86a9925a82d7c1
                 <h5 class="mb-1">{{ item.title }}</h5>
                 <small>By {{ item.author }} | {{ item.created_at }}</small>
                 <p class="mb-1">{{ item.content|truncatechars:100 }}</p>
@@ -23,4 +27,8 @@
     </div>
 </div>
 </body>
+<<<<<<< HEAD
 </html>
+=======
+</html>
+>>>>>>> 92e5d838938e903183af260a9f86a9925a82d7c1

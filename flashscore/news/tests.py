@@ -7,23 +7,20 @@ from news.models import News
 class NewsTests(TestCase):
 
     def setUp(self):
-        # Создание тестового пользователя
         self.user = User.objects.create_user(username='testuser', password='testpassword')
 
     def test_news_creation(self):
-        # Проверка создания новости
         news = News.objects.create(
             title='Test News',
             content='This is a test news content.',
             author=self.user
         )
-        # Проверка, что новость была сохранена в базе данных
         self.assertEqual(news.title, 'Test News')
         self.assertEqual(news.content, 'This is a test news content.')
         self.assertEqual(news.author, self.user)
 
     def test_create_news_view(self):
-        self.client.login(username='testuser', password='testpassword')  # Убедись, что ты залогинен
+        self.client.login(username='testuser', password='testpassword')
         response = self.client.get(reverse('create_news'))
         self.assertEqual(response.status_code, 200)
         data = {'title': 'New Test News', 'content': 'This is a new test news.'}
@@ -38,7 +35,7 @@ class NewsTests(TestCase):
             content='Old content',
             author=self.user
         )
-        self.client.login(username='testuser', password='testpassword')  # Убедись, что ты залогинен
+        self.client.login(username='testuser', password='testpassword')
         response = self.client.get(reverse('edit_news', kwargs={'news_id': news.id}))
         self.assertEqual(response.status_code, 200)
 
@@ -59,5 +56,4 @@ class NewsTests(TestCase):
         self.client.login(username='testuser', password='testpassword')
 
         response = self.client.get(reverse('edit_news', kwargs={'news_id': news.id}))
-        # Ожидаем редирект на страницу входа, используя правильный URL
         self.assertRedirects(response, '/login/?next=' + reverse('edit_news', kwargs={'news_id': news.id}))

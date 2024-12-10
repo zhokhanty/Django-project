@@ -1,74 +1,34 @@
-from .models import Sport, League, Team, Player, Coach
-from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required, user_passes_test
-from django.views.decorators.csrf import csrf_exempt
 from .forms import SportForm, LeagueForm, TeamForm, PlayerForm, CoachForm
 import requests
-from django.shortcuts import render
-from django.http import JsonResponse
-
-import json
 from django.http import Http404, JsonResponse
-from django.shortcuts import render, get_object_or_404
-from django.urls import reverse_lazy
-
-from . import models
-from .services import fetch_sports_data, fetch_leagues_by_sport, fetch_teams_by_league
+from django.shortcuts import render, get_object_or_404, redirect
 from .models import Sport, League, Team, Player, Coach
 from .forms import SportForm
-from django.db.models import F
 from django.views.decorators.csrf import csrf_exempt
-
-
-# scores/views.py
-from django.shortcuts import render
-from django.db.models import Sum, Count
-from .models import League, Team
-import json
-from django.db import models
-
-import matplotlib.pyplot as plt
-from io import BytesIO
-import base64
-from django.http import HttpResponse
-from django.db.models import Count, Avg
-from django.shortcuts import render
-from .models import League
-
-
 import matplotlib.pyplot as plt
 from io import BytesIO
 import base64
 from django.db.models import Avg, Count
-from django.shortcuts import render
-from .models import League
-
 
 def analytics_view(request):
-    # Собираем данные о среднем количестве очков в каждой лиге, фильтруя None значения
     leagues = League.objects.annotate(avg_points=Avg('teams__points_l'))
 
-    # Заполняем None значениями нулями
     league_names = [league.name for league in leagues]
     points = [league.avg_points if league.avg_points is not None else 0 for league in leagues]
 
-    # Вычисление среднего значения
     avg_points = leagues.aggregate(avg_points=Avg('avg_points'))['avg_points'] or 0
 
-    # Настройка диаграммы
     plt.figure(figsize=(12, 7))
     colors = plt.cm.tab20c(range(len(league_names)))  # Используем палитру цветов
     bars = plt.bar(league_names, points, color=colors, edgecolor="black")
 
-    # Линия среднего значения
     plt.axhline(y=avg_points, color='red', linestyle='--', label=f"Average: {avg_points:.2f}")
 
-    # Подписи на столбцах
     for bar, point in zip(bars, points):
         plt.text(bar.get_x() + bar.get_width() / 2, bar.get_height(), f"{point:.2f}",
                  ha='center', va='bottom', fontsize=10, color="black", fontweight="bold")
 
-    # Настройка внешнего вида
     plt.title("Average League Points", fontsize=16, fontweight='bold', color="darkblue")
     plt.xlabel("Leagues", fontsize=14, fontweight='bold')
     plt.ylabel("Average Points", fontsize=14, fontweight='bold')
@@ -76,7 +36,6 @@ def analytics_view(request):
     plt.grid(axis='y', linestyle='--', alpha=0.7)
     plt.legend(fontsize=12)
 
-    # Сохранение диаграммы в поток
     buffer = BytesIO()
     plt.tight_layout()
     plt.savefig(buffer, format='png')
@@ -84,15 +43,12 @@ def analytics_view(request):
     image_png = buffer.getvalue()
     buffer.close()
 
-    # Конвертируем изображение в base64
     graphic = base64.b64encode(image_png).decode('utf-8')
 
-    # Передача данных в шаблон
     return render(request, 'scores/analytics.html', {
         'graphic': graphic,
         'avg_points': avg_points,
     })
-
 
 def check_role(user, role):
     profile = getattr(user, 'profile', None)
@@ -104,17 +60,13 @@ def load_all_sports(request):
         response = requests.get(url)
 
         if response.status_code == 200:
-            # Parse the API response
             sports_data = response.json().get('sports', [])
             
-            # Save sports into the database (avoid duplicates)
             for sport in sports_data:
                 Sport.objects.get_or_create(name=sport['strSport'])
             
-            # Fetch all sports from the database
             sports = Sport.objects.all()
 
-            # Render sports to the template
             return render(request, 'sports/home.html', {'sports': sports})
         else:
             # Handle API errors
@@ -154,22 +106,14 @@ def sport_update(request, sport_id):
         form = SportForm(instance=sport)
     return render(request, 'sports/sport_form.html', {'form': form})
 
-
 def league_table_view(request, league_id):
-    """
-    Отображение таблицы выбранной лиги.
-    """
     league = get_object_or_404(League, id=league_id)
-    teams = league.teams.order_by('-points_l', 'name')  # Сортировка по очкам и алфавиту
-
+    teams = league.teams.order_by('-points_l', 'name')
     context = {
         'league': league,
         'teams': teams,
     }
     return render(request, 'scores/league_table.html', context)
-
-
-
 
 @csrf_exempt
 @login_required

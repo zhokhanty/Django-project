@@ -1,11 +1,8 @@
-
 from django.test import TestCase
 from django.urls import reverse
 from django.contrib.auth.models import User
 from django.contrib.auth import get_user_model
-from rest_framework import status
 from .models import Profile
-from scores.models import Team
 
 
 class UserViewsTests(TestCase):
@@ -15,22 +12,18 @@ class UserViewsTests(TestCase):
     logout_url = reverse('logout')
 
     def setUp(self):
-        # Create a test user
         self.user = User.objects.create_user(username='testuser', password='password123')
 
-        # Check if the user already has a profile, and create it only if necessary
         if not hasattr(self.user, 'profile'):
             self.profile = Profile.objects.create(user=self.user)
         else:
             self.profile = self.user.profile
 
     def test_register_view(self):
-        # Ensure the registration form is rendered correctly
         response = self.client.get(self.register_url)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'users/register.html')
 
-        # Simulate successful registration and expect a redirect to the login page
         response = self.client.post(self.register_url, {
             'username': 'newuser',
             'password1': 'ComplexPassword123!',
@@ -49,10 +42,8 @@ class UserViewsTests(TestCase):
         self.assertTemplateUsed(response, 'users/profile.html')
 
     def test_logout_view(self):
-        # Логинимся перед выходом
         self.client.login(username='testuser', password='testpassword')
 
-        # Проверка логаута
         response = self.client.get(self.logout_url)
-        self.assertRedirects(response, reverse('sport_list'))  # После логаута редирект на список спорта
-        self.assertNotIn('_auth_user_id', self.client.session)  # Проверка, что сессия пользователя была удалена
+        self.assertRedirects(response, reverse('sport_list'))
+        self.assertNotIn('_auth_user_id', self.client.session)

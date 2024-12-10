@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 {#<!DOCTYPE html>#}
 {#<html lang="en">#}
 {#<head>#}
@@ -63,6 +64,8 @@
 {#</html>#}
 
 
+=======
+>>>>>>> 92e5d838938e903183af260a9f86a9925a82d7c1
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -100,6 +103,7 @@
     </div>
 
     <h2 class="mt-4">Leagues</h2>
+<<<<<<< HEAD
     <div>
             <a href="http://127.0.0.1:8000/league/4/table/">EPL</a>
             <a href="http://127.0.0.1:8000/league/7/table/">LaLiga</a>
@@ -108,6 +112,26 @@
             <a href="http://127.0.0.1:8000/league/8/table/">Liga 1</a>
         
     </div>
+=======
+    {% if leagues %}
+    <ul class="list-group league-list">
+        {% for league in leagues %}
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+            {% if league.id == id %}
+            <a href="{% url 'league_detail' league.id %}" class="text-decoration-none">
+                {{ league.name }}
+            </a>
+            {% endif %}
+            <img src="{{ league.icon.url }}" alt="{{ league.name }} icon" style="width: 30px; height: 30px;">
+        </li>
+        {% endfor %}
+    </ul>
+    {% else %}
+    <div class="alert alert-warning" role="alert">
+        No leagues available for this sport.
+    </div>
+    {% endif %}
+>>>>>>> 92e5d838938e903183af260a9f86a9925a82d7c1
 </div>
 
 

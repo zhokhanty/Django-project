@@ -44,5 +44,4 @@ urlpatterns = [
     path('leagues/<str:country>/', views.leagues_by_country, name='leagues_by_country'),
     path('teams/<str:league_name>/', views.teams_in_league, name='teams_in_league'),
     path('league/<int:league_id>/table/', views.league_table_view, name='league_table'),
-
 ]
