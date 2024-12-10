@@ -15,20 +15,31 @@ def news_list(request):
     news = News.objects.all().order_by('-created_at')
     return render(request, 'news/news_list.html', {'news': news})
 
+from django.shortcuts import render, get_object_or_404
+from .models import News
+from .forms import CommentForm
+
 def news_detail(request, news_id):
-    news = get_object_or_404(News, id=news_id)
-    comments = news.comments.all()
-    if request.method == 'POST':
+    news_item = get_object_or_404(News, id=news_id)
+    comments = news_item.comments.all()
+
+    if request.method == "POST":
         form = CommentForm(request.POST)
         if form.is_valid():
             comment = form.save(commit=False)
-            comment.news = news
+            comment.news = news_item
             comment.author = request.user
             comment.save()
-            return redirect('news_detail', news_id=news.id)
+            return redirect('news_detail', news_id=news_id)
     else:
         form = CommentForm()
-    return render(request, 'news/new_detail.html', {'news': news, 'comments': comments, 'form': form})
+
+    return render(request, 'news/new_detail.html', {
+        'news': news_item,
+        'comments': comments,
+        'form': form
+    })
+
 
 def check_role(user, role):
     profile = getattr(user, 'profile', None)

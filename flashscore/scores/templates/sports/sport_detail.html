@@ -29,6 +29,8 @@
 </head>
 <body>
 <div class="container mt-5">
+<a href="http://127.0.0.1:8000/sports/" class="btn btn-secondary mb-4">Back to Sports</a>
+
     <div class="sport-header">
         <h1 class="m-0">{{ sport.name }}</h1>
         <img src="{{ sport.strSportThumb }}" alt="{{ sport.name }} icon" style="width: 50px; height: 50px;">
@@ -36,12 +38,7 @@
 
     <h2 class="mt-4">Leagues</h2>
     <div>
-            <a href="http://127.0.0.1:8000/league/4/table/">EPL</a>
-            <a href="http://127.0.0.1:8000/league/7/table/">LaLiga</a>
-            <a href="http://127.0.0.1:8000/league/5/table/">Bundesliga</a>
-            <a href="http://127.0.0.1:8000/league/6/table/">Seria A</a>
-            <a href="http://127.0.0.1:8000/league/8/table/">Liga 1</a>
-        
+
     </div>
     {% if leagues %}
     <ul class="list-group league-list">
@@ -58,8 +55,14 @@
     </ul>
     {% else %}
     <div class="alert alert-warning" role="alert">
-        No leagues available for this sport.
+        <a href="http://127.0.0.1:8000/league/2/table/">EPL</a>
+            <a href="http://127.0.0.1:8000/league/5/table/">LaLiga</a>
+            <a href="http://127.0.0.1:8000/league/3/table/">Bundesliga</a>
+            <a href="http://127.0.0.1:8000/league/4/table/">Seria A</a>
+            <a href="http://127.0.0.1:8000/league/6/table/">Liga 1</a>
+
     </div>
+
     {% endif %}
 </div>
 
