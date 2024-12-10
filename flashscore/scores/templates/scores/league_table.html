@@ -1,50 +1,8 @@
-<<<<<<< HEAD
-{#<!DOCTYPE html>#}
-{#<html lang="en">#}
-{#<head>#}
-{#    <meta charset="UTF-8">#}
-{#    <meta name="viewport" content="width=device-width, initial-scale=1.0">#}
-{#    <title>{{ league.name }} - Таблица</title>#}
-{#</head>#}
-{#<body>#}
-{#    <h1>Таблица: {{ league.name }}</h1>#}
-{#    <table border="1">#}
-{#        <thead>#}
-{#            <tr>#}
-{#                <th>Позиция</th>#}
-{#                <th>Команда</th>#}
-{#                <th>Очки</th>#}
-{#            </tr>#}
-{#        </thead>#}
-{#        <tbody>#}
-{#            {% for team in teams %}#}
-{#            <tr>#}
-{#                <td>{{ forloop.counter }}</td>#}
-{#                <td>#}
-{#                    {% if team.icon %}#}
-{#                    <img src="{{ team.icon.url }}" alt="{{ team.name }}" width="20" height="20">#}
-{#                    {% endif %}#}
-{#                    {{ team.name }}#}
-{#                </td>#}
-{#                <td>{{ team.points_l }}</td>#}
-{#            </tr>#}
-{#            {% endfor %}#}
-{#        </tbody>#}
-{#    </table>#}
-{#</body>#}
-{#</html>#}
-
-
-
-
-=======
->>>>>>> 92e5d838938e903183af260a9f86a9925a82d7c1
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<<<<<<< HEAD
     <title>{{ sport.name }}</title>
 
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
@@ -91,7 +49,6 @@
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-=======
     <title>{{ league.name }} - Таблица</title>
 </head>
 <body>
@@ -119,6 +76,5 @@
             {% endfor %}
         </tbody>
     </table>
->>>>>>> 92e5d838938e903183af260a9f86a9925a82d7c1
 </body>
 </html>
