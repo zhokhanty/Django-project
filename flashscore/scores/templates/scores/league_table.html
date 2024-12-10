@@ -1,0 +1,91 @@
+{#<!DOCTYPE html>#}
+{#<html lang="en">#}
+{#<head>#}
+{#    <meta charset="UTF-8">#}
+{#    <meta name="viewport" content="width=device-width, initial-scale=1.0">#}
+{#    <title>{{ league.name }} - Таблица</title>#}
+{#</head>#}
+{#<body>#}
+{#    <h1>Таблица: {{ league.name }}</h1>#}
+{#    <table border="1">#}
+{#        <thead>#}
+{#            <tr>#}
+{#                <th>Позиция</th>#}
+{#                <th>Команда</th>#}
+{#                <th>Очки</th>#}
+{#            </tr>#}
+{#        </thead>#}
+{#        <tbody>#}
+{#            {% for team in teams %}#}
+{#            <tr>#}
+{#                <td>{{ forloop.counter }}</td>#}
+{#                <td>#}
+{#                    {% if team.icon %}#}
+{#                    <img src="{{ team.icon.url }}" alt="{{ team.name }}" width="20" height="20">#}
+{#                    {% endif %}#}
+{#                    {{ team.name }}#}
+{#                </td>#}
+{#                <td>{{ team.points_l }}</td>#}
+{#            </tr>#}
+{#            {% endfor %}#}
+{#        </tbody>#}
+{#    </table>#}
+{#</body>#}
+{#</html>#}
+
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ sport.name }}</title>
+
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+
+        body {
+            background-color: #f8f9fa;
+        }
+        .sport-header {
+            background-color: #007bff;
+            color: white;
+            padding: 20px;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+        }
+        .sport-header img {
+            margin-left: 15px;
+        }
+        .league-list {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+<div class="container mt-5">
+    <div class="sport-header">
+        <h1 class="m-0">{{ sport.name }}</h1>
+        <img src="{{ sport.strSportThumb }}" alt="{{ sport.name }} icon" style="width: 50px; height: 50px;">
+    </div>
+
+    <h2 class="mt-4">Leagues</h2>
+    <div>
+            <a href="http://127.0.0.1:8000/league/4/table/">EPL</a>
+            <a href="http://127.0.0.1:8000/league/7/table/">LaLiga</a>
+            <a href="http://127.0.0.1:8000/league/5/table/">Bundesliga</a>
+            <a href="http://127.0.0.1:8000/league/6/table/">Seria A</a>
+            <a href="http://127.0.0.1:8000/league/8/table/">Liga 1</a>
+        
+    </div>
+</div>
+
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

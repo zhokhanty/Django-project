@@ -1,0 +1,118 @@
+{#<!DOCTYPE html>#}
+{#<html lang="en">#}
+{#<head>#}
+{#    <meta charset="UTF-8">#}
+{#    <meta name="viewport" content="width=device-width, initial-scale=1.0">#}
+{#    <title>{{ sport.name }}</title>#}
+{##}
+{#    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">#}
+{#    <style>#}
+{##}
+{#        body {#}
+{#            background-color: #f8f9fa;#}
+{#        }#}
+{#        .sport-header {#}
+{#            background-color: #007bff;#}
+{#            color: white;#}
+{#            padding: 20px;#}
+{#            border-radius: 5px;#}
+{#            display: flex;#}
+{#            align-items: center;#}
+{#        }#}
+{#        .sport-header img {#}
+{#            margin-left: 15px;#}
+{#        }#}
+{#        .league-list {#}
+{#            margin-top: 20px;#}
+{#        }#}
+{#    </style>#}
+{#</head>#}
+{#<body>#}
+{#<div class="container mt-5">#}
+{#    <div class="sport-header">#}
+{#        <h1 class="m-0">{{ sport.name }}</h1>#}
+{#        <img src="{{ sport.strSportThumb }}" alt="{{ sport.name }} icon" style="width: 50px; height: 50px;">#}
+{#    </div>#}
+{##}
+{#    <h2 class="mt-4">Leagues</h2>#}
+{#    {% if leagues %}#}
+{#    <ul class="list-group league-list">#}
+{#        {% for league in leagues %}#}
+{#        <li class="list-group-item d-flex justify-content-between align-items-center">#}
+{#            {% if league.id == id %}#}
+{#            <a href="{% url 'league_detail' league.id %}" class="text-decoration-none">#}
+{#                {{ league.name }}#}
+{#            </a>#}
+{#            {% endif %}#}
+{#            <img src="{{ league.icon.url }}" alt="{{ league.name }} icon" style="width: 30px; height: 30px;">#}
+{#        </li>#}
+{#        {% endfor %}#}
+{#    </ul>#}
+{#    {% else %}#}
+{#    <div class="alert alert-warning" role="alert">#}
+{#        No leagues available for this sport.#}
+{#    </div>#}
+{#    {% endif %}#}
+{#</div>#}
+{##}
+{##}
+{#<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>#}
+{#<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>#}
+{#<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>#}
+{#</body>#}
+{#</html>#}
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ sport.name }}</title>
+
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+
+        body {
+            background-color: #f8f9fa;
+        }
+        .sport-header {
+            background-color: #007bff;
+            color: white;
+            padding: 20px;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+        }
+        .sport-header img {
+            margin-left: 15px;
+        }
+        .league-list {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+<div class="container mt-5">
+    <div class="sport-header">
+        <h1 class="m-0">{{ sport.name }}</h1>
+        <img src="{{ sport.strSportThumb }}" alt="{{ sport.name }} icon" style="width: 50px; height: 50px;">
+    </div>
+
+    <h2 class="mt-4">Leagues</h2>
+    <div>
+            <a href="http://127.0.0.1:8000/league/4/table/">EPL</a>
+            <a href="http://127.0.0.1:8000/league/7/table/">LaLiga</a>
+            <a href="http://127.0.0.1:8000/league/5/table/">Bundesliga</a>
+            <a href="http://127.0.0.1:8000/league/6/table/">Seria A</a>
+            <a href="http://127.0.0.1:8000/league/8/table/">Liga 1</a>
+        
+    </div>
+</div>
+
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
