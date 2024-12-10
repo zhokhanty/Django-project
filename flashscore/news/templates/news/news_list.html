@@ -8,6 +8,8 @@
 </head>
 <body>
 <div class="container mt-5">
+<a href="http://127.0.0.1:8000/sports/3/" class="btn btn-primary mt-3">Leagues</a>
+
     <h1 class="text-center mb-4">Latest News</h1>
     {% if request.user.role == 'journalist' %}
         <a href="{% url 'create_news' %}" class="btn btn-primary mb-3">Add News</a>

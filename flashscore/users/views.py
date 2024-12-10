@@ -46,10 +46,16 @@ def login_view(request):
         form = LoginForm()
     return render(request, 'users/login.html', {'form': form})
 
+
+from django.shortcuts import render, get_object_or_404, redirect
+from .models import Profile, Team
 @login_required
 def profile_view(request):
     profile, created = Profile.objects.get_or_create(user=request.user)
     teams = Team.objects.all()
+
+    # Получаем роль пользователя, предполагая, что у вас есть поле `role` в модели User
+    user_role = profile.role  # Замените на правильный атрибут, если у вас используется другое поле
 
     if request.method == 'POST':
         favorite_team_id = request.POST.get('favorite_team')
@@ -61,6 +67,7 @@ def profile_view(request):
     return render(request, 'users/profile.html', {
         'profile': profile,
         'teams': teams,
+        'user_role': user_role,  # Добавляем роль пользователя в контекст
     })
 
 def logout_view(request):
