@@ -1,120 +1,123 @@
-# Django-project
-This project is a sports management platform inspired by Flashscore, aimed at creating a web application to track sports data such as teams, leagues, players, and coaches. The platform also allows users to register, manage profiles, and interact with sports content through a CRUD interface.
+# Flashscore Project
 
-## Team Members:
+## Team Members
+- **Bagytzhan Zhalgas** (22B030317)  
+- **Mussilimov Galymzhan** (22B031186)  
+- **Kyanysh Farabi** (22B030489)
 
-      Bagytzhan Zhalgas (22B030317)
-      Mussilimov Galymzhan (22B031186)
-      Kyanysh Farabi (22B030489)
-      
-# Project Structure
+---
 
-This project consists of two main applications:
+## Overview
+Flashscore is a football-focused web application built with Django. It offers comprehensive data about football leagues, teams, players, coaches, and matches. The application supports multiple user roles, including Administrator, Journalist, and Regular User, each with distinct permissions and access levels.
 
-      Scores
-      Users
+---
 
-# 1. Scores Application
+## Project Structure
 
-The Scores app is responsible for managing sports data, including various models like Sports, Leagues, Teams, Players, and Coaches. Each of these models has full CRUD (Create, Read, Update, Delete) functionality.
+### 1. Users Application
+**Purpose:** Manages user authentication and roles (Admin, Journalist, Regular User).  
+**Key Features:**
+- User registration and login.
+- Role management and permissions.
+- Profile updates.
 
-Models Overview
+### 2. News Application
+**Purpose:** Facilitates the creation and viewing of football-related news articles.  
+**Key Features:**
+- CRUD operations for news articles (available to Journalists and Admins).
+- Display of the latest football news for all users.
 
-      1.1 Sports
-      
-      The fundamental model that holds a list of popular sports. Each sport entry consists of key attributes, including associated leagues.
-      
-      1.2 Leagues
-      
-      A model that represents different leagues, organized by countries or other relevant categories. Leagues are associated with specific sports.
-      
-      1.3 Teams
-      
-      This model manages sports teams, which are grouped under different leagues.
-      
-      1.4 Players
-      
-      This model holds detailed information about players, including:
-      
-      Player's name
-      Position
-      Team affiliation
-      Player's number, and other attributes.
-      
-      1.5 Coaches
-      
-      The Coaches model provides detailed information about coaches, including their team affiliation.
+### 3. Scores Application
+**Purpose:** Provides detailed data about football leagues, teams, players, coaches, and matches.  
+**Key Features:**
+- League tables and statistics.
+- Team rosters, including player and coach details.
+- Match schedules and results.
 
-## CRUD Operations
+---
 
-Each model has its own set of CRUD operations to manage the data. Below are the URLs for the CRUD views of each model:
+## Core Features
 
-      Sport CRUD
-      - Create:       /sport/create/
-      - Detail:       /sport/<int:id>/
-      - Update:       /sport/<int:id>/update/
-      - Delete:       /sport/<int:id>/delete/
+### 1. Models
+- **Users:** Custom user model with roles and authentication settings.
+- **News:** Models for creating and managing news articles.
+- **Scores:** Models for leagues, teams, players, coaches, and matches.
 
+**Relationships Between Models:**
+- **One-to-Many:** A league can have many teams, but a team belongs to one league.
+- **Many-to-Many:** Teams can play against multiple opponents in different matches.
 
-      League CRUD
-      - Create:       /league/create/
-      - Detail:       /league/<int:id>/
-      - Update:       /league/<int:id>/update/
-      - Delete:       /league/<int:id>/delete/
+**Custom Methods:** Business logic is implemented directly in models when required.
 
+### 2. Views
+- **CRUD Operations:** Create, Read, Update, and Delete functionality for managing data (e.g., news, matches).
+- **GET Views:** List and detail views for entities like teams, leagues, and matches.
+- **POST Views:** Form submissions for creating or updating content, such as news articles or profiles.
 
-      Team CRUD
-      - Create:       /team/create/
-      - Detail:       /team/<int:id>/
-      - Update:       /team/<int:id>/update/
-      - Delete:       /team/<int:id>/delete/
+### 3. Templates
+- At least six templates utilizing Django's template inheritance for consistent layouts.
+- Styling incorporates Bootstrap or a similar CSS framework for a modern, responsive design.
 
+### 4. API Development (DRF)
+- **Endpoints:** CRUD API endpoints for teams, players, matches, and leagues.
+- **Authentication:** Token-based authentication using JWT.
+- **Testing:** Endpoints tested with tools like Postman or cURL.
+- **Documentation:** API documentation available for developers.
 
-      Player CRUD
-      - Create:       /player/create/
-      - Detail:       /player/<int:id>/
-      - Update:       /player/<int:id>/update/
-      - Delete:       /player/<int:id>/delete/
+---
 
-      Coach CRUD
-      - Create:       /coach/create/
-      - Detail:       /coach/<int:id>/
-      - Update:       /coach/<int:id>/update/
-      - Delete:       /coach/<int:id>/delete/
+## Authentication & Role-Based Access Control
+- **JWT Authentication:** Secures API endpoints and user sessions.
+- **Role Permissions:**
+  - **Admin:** Full access to view, edit, and delete all data (users, teams, matches, etc.).
+  - **Journalist:** Permissions to create and edit news articles.
+  - **User:** Read-only access to news, teams, and matches, with the ability to comment.
 
+---
 
+## Scores Application
 
-## Global Search
+### 1. Sports
+The fundamental model that holds a list of popular sports. Each sport entry consists of key attributes, including associated leagues.
 
-A search system allows users to search across all sports, teams, players, and coaches.
+### 2. Leagues
+A model that represents different leagues, organized by countries or other relevant categories. Leagues are associated with specific sports.
 
-The search logic:
+### 3. Teams
+This model manages sports teams, which are grouped under different leagues.
 
-    def global_search(request):
-    query = request.GET.get('q')
-    sports = Sport.objects.filter(name__icontains=query) if query else []
-    teams = Team.objects.filter(name__icontains=query) if query else []
-    players = Player.objects.filter(firstname__icontains=query) | Player.objects.filter(lastname__icontains=query) if query else []
-    coaches = Coach.objects.filter(firstname__icontains=query) | Coach.objects.filter(lastname__icontains=query) if query else []
+### 4. Matches
+This model holds detailed information about games, including:
+- Points and positions.
+- Teams and other attributes.
 
-    context = {
-        'query': query,
-        'sports': sports,
-        'teams': teams,
-        'players': players,
-        'coaches': coaches
-    }
-    return render(request, 'scores/search_results.html', context)
+### 5. Coaches
+The Coaches model provides detailed information about coaches, including their team affiliations.
 
-# 2. Users Application
+### Analytics
+- **Basic Insights:** Tracks average team points and league standings.
+- **Visualizations:** Created using libraries like Matplotlib to display charts and graphs.
 
-This app is focused on user authentication and profile management. It provides:
+---
 
-      User Registration: Users can create a profile.
-      Login/Logout System: Registered users can log in to access additional features.
-      Profile Management: Users can view and edit their profile details.
-      
-User Registration & Authentication
+## Database Setup
+- **Schema:** Reflects relationships between models using Django's `ForeignKey` and `ManyToManyField`.
+- **Optimization:** Indexing applied for faster query performance.
 
-      Users can sign up, log in, and log out.
-      Profile management allows users to modify their personal information.
+---
+
+## Logging
+- Logs track significant actions such as user logins, API access, and data modifications.
+
+---
+
+## Suggestions for Visual Enhancements
+1. **User Roles and Permissions:** Add a diagram illustrating the hierarchy of roles and their permissions.
+2. **News Creation:** Include a screenshot of the news creation interface or form.
+3. **Scores Section:** Display a sample league table or match schedule.
+4. **API Documentation:** Add a screenshot of API documentation or Postman tests.
+5. **Analytics:** Include graphs showing team performance or match statistics.
+6. **Landing Page:** Showcase the homepage with a clean and attractive design.
+
+---
+
